@@ -10,7 +10,7 @@
 
 课程围绕作者自己写的教材进行设计([The Elements of Computing Systems](https://www.nand2tetris.org/book))。
 
-21年刚刚再版了一次，Z-library可[下载](https://zh.book4you.org/book/15103557/a34b88)。
+21年刚刚再版了一次，Z-library可[下载](https://zh.book4you.org/book/15103557/a34b88)。注意官网的章节节选自旧版。
 
 作者还做了一套教学视频在Coursera上。不过自己还是更喜欢读教材+做作业的方式。
 
