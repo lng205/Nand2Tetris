@@ -10,7 +10,7 @@
 
 ## 4.1 背景知识
 
-> A machine language is an agreed-upon formalism designed to code machine instructions
+> A machine language is an agreed-upon formalism designed to code machine instructions.
 
 *机器语言可视为一种通过CPU和寄存器操作内存的规则*
 
