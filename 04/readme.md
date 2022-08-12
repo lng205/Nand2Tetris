@@ -1,5 +1,7 @@
 # 四、机器语言
 
+## 总结
+
 本章内容开始超出数电范畴，进入底层编程领域。
 
 本章介绍机器语言，为下一章搭建通用计算机提供基础。
@@ -8,11 +10,13 @@
 
 ![pic](../images/Ch0404.png)
 
+
 ## 4.1 背景知识
 
 > A machine language is an agreed-upon formalism designed to code machine instructions.
 
 *机器语言可视为一种通过CPU和寄存器操作内存的规则*
+
 
 ### 4.1.1 机器结构
 
