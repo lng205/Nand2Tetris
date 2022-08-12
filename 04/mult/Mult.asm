@@ -13,11 +13,11 @@
 //  Psudo code:
 
 //      R2 = 0
-//      n = 0
+//      n = R0
 //  LOOP:
-//      if (n == R0) goto END
+//      if (n == 0) goto END
 //      R2 = R2 + R1
-//      n = n + 1
+//      n = n - 1
 //      goto LOOP
 //  END:
 
@@ -27,14 +27,14 @@
     // R2=0, n=0
     @R2
     M=0
+    @R0
+    D=M
     @n
-    M=0
+    M=D
 (LOOP)
-    // if (n == R0) goto END
+    // if (n == 0) goto END
     @n
     D=M
-    @R0
-    D=D-M
     @END
     D;JEQ
     // R2 = R2 + R1
@@ -42,9 +42,9 @@
     D=M
     @R2
     M=D+M
-    // n = n + 1
+    // n = n - 1
     @n
-    M=M+1
+    M=M-1
     @LOOP
     0;JMP
 (END)

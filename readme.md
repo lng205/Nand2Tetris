@@ -6,7 +6,7 @@
 > exception: in spite of their fantastic complexity, one can completely
 > understand how modern computers work, and how they are built. 
 
-如名字一样，课程由非门开始，搭建出一套可以玩俄罗斯方块的电脑。
+如名字一样，课程由与非门开始，搭建出一套可以玩俄罗斯方块的电脑。
 
 课程围绕作者自己写的教材进行设计([The Elements of Computing Systems](https://www.nand2tetris.org/book))。
 
@@ -14,7 +14,7 @@
 
 作者还做了一套教学视频在Coursera上。不过自己还是更喜欢读教材+做作业的方式。
 
-课程高度专注于计算机体系结构中的核心概念，设计往往只求实现功能，将优化、差错控制等内容留给更细分的专业领域。
+课程高度专注于计算机体系结构中的核心概念，设计时只求实现功能，将优化、错误处理等内容留给更细分的专业领域。
 
 课程分为上下两半，各6章。每章专注于计算机系统中的一个层次进行设计，下一层在前一层的基础上展开。
 
