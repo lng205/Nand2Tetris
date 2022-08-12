@@ -51,13 +51,15 @@ CPU内含两个16位寄存器，称为D和A。D专用于存储数据，A用于�
 
 ### 指令(Instruction Set Architecture)
 
-A指令用于写入A寄存器，A寄存器同时接至CPU和两块内存。
+A(Addr)指令用于写入A寄存器，A寄存器同时接至CPU和两块内存。
+
+最高位置0表示A指令（使能A寄存器写入）。
 
 ![C-instruction](../images/Ch0401.png)
 
-C指令语句可包括计算(comp)、目的地(dest)、跳转(jump)三部分。
+C(Comp)指令语句可包括计算(comp)、目的地(dest)、跳转(jump)三部分。
 
-计算部分共7位，编码与ALU相似，其中第一位(a)决定A作为地址还是数据。
+计算部分共7位，第一位(a)决定A作为地址还是数据，后6位控制ALU。
 
 数据的位置可以是D, A, M[A]，目的地部分共三位，分别控制是否将结果写入对应的位置。
 
@@ -66,7 +68,8 @@ C指令语句可包括计算(comp)、目的地(dest)、跳转(jump)三部分。
 #### E.g. 
 
 ![E.g.](../images/Ch0402.png)
-![E.g.](../images/Ch0405.png)
+![fig4.4](../images/Ch0405.png)
+![fig4.5](../images/Ch0406.png)
 
 // 内为注释内容
 
@@ -88,3 +91,10 @@ M 表示A指向的数据内存地址中存储的值。
 ![fig 4.6](../images/Ch0403.png)
 
 屏幕和键盘的扫描刷新由异步的外部硬件提供，系统中没有中断。
+
+
+## 代码
+
+**自上而下** ：先在高层次设计，再向低层次翻译。在汇编开发中较为适用。
+
+[CPU模拟器教程](https://www.nand2tetris.org/_files/ugd/44046b_24b3a15aa628404fbf6dacd86d7da3af.pdf)
