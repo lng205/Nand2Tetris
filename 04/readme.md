@@ -10,6 +10,8 @@
 
 本章介绍机器语言，为下一章搭建通用计算机提供基础。
 
+**本章十分精彩，有如最后一块拼图。**
+
 [Wiki](https://en.wikipedia.org/wiki/Hack_computer)
 
 ![pic](../images/Ch0404.png)

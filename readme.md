@@ -1,18 +1,10 @@
 # 总结
 
-[课程官网](https://www.nand2tetris.org/)
-
 > Bits, however, and computing systems at large, entail a consoling
 > exception: in spite of their fantastic complexity, one can completely
 > understand how modern computers work, and how they are built. 
 
 如名字一样，课程由与非门开始，搭建出一套可以玩俄罗斯方块的电脑。
-
-课程围绕作者自己写的教材进行设计([The Elements of Computing Systems](https://www.nand2tetris.org/book))。
-
-21年刚刚再版了一次，Z-library可[下载](https://zh.book4you.org/book/15103557/a34b88)。注意官网的章节节选自旧版。
-
-作者还做了一套教学视频在Coursera上。不过自己还是更喜欢读教材+做作业的方式。
 
 课程高度专注于计算机体系结构中的核心概念，设计时只求实现功能，将优化、错误处理等内容留给更细分的专业领域。
 
@@ -34,6 +26,14 @@
 
 
 ## 资源
+
+[课程官网](https://www.nand2tetris.org/)
+
+课程围绕作者自己写的教材进行设计([The Elements of Computing Systems](https://www.nand2tetris.org/book))。
+
+21年刚刚再版了一次，Z-library可[下载](https://zh.book4you.org/book/15103557/a34b88)。注意官网的章节节选自旧版。
+
+作者还做了一套教学视频在Coursera上。不过自己还是更喜欢读教材+做作业的方式。
 
 课程内容完全自封闭，无需任何前置知识。
 
