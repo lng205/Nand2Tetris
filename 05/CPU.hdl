@@ -39,5 +39,45 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // Set instrucBuf = 0 when instruction[0] == 0;
+    Mux16(a=false, b=instruction, sel=instruction[0], out[11]=instructBuf11,
+          out[12]=instructBuf12, out[13]=instructBuf13,
+          out[14]=instructBuf14, out[15]=instructBuf15);
+
+    // Calc
+    ALU(x=D, y=A, zx=instruction[4], nx=instruction[5]
+                , zy=instruction[6], ny=instruction[7]
+                , f =instruction[8], no=instruction[9]
+                , out=oC, out=outM, zr=zr, ng=ng);
+
+
+    // Write to A, D, M respectively based on instruction[10..12]
+
+    // Set A = instruction when instruction[0] == 0 
+    // or A = oC when instruction[10] == 1
+    Not(in=instruction[0], out=instruct0Not);
+    Or(a=instruct0Not, b=instruction[10], out=lA);
+    Mux16(a=instruction, b=oC, sel=instruction[10], out=iA);
+    ARegister(in=iA, load=lA, out[0..14]=addressM, out=oA);
+
+    // Select inM when instruction[3] == 1
+    Mux16(a=oA, b=inM, sel=instruction[3], out=A);
+
+    // Set D when instrucBuf[11] == 1
+    DRegister(in=oC, load=instructBuf11, out=D);
+
+    // Write M when instructBuf12 == 1
+    Not(in=instructBuf12, out=instruct12Not);
+    Not(in=instruct12Not, out=writeM);
+
+
+    // Set pc when (oC <, =, > 0) based on instructBuf[13..15]
+    And(a=instructBuf13, b=ng, out=lpc1);
+    And(a=instructBuf14, b=zr, out=lpc2);
+    Or(a=ng, b=zr, out=ngORzr);
+    Not(in=ngORzr, out=ngNotANDzrNot);
+    And(a=instructBuf15, b=ngNotANDzrNot, out=lpc3);
+    Or(a=lpc1, b=lpc2, out=lpc4);
+    Or(a=lpc3, b=lpc4, out=lpc);
+    PC(in=A, reset=reset, load=lpc, inc=true, out[0..14]=pc);
 }
