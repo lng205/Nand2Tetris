@@ -1,5 +1,10 @@
 # 二、布尔计算
 
+> Therefore, constructive understanding of binary addition
+> holds the key to understanding many fundamental operations performed by
+> the computer’s hardware.
+
+
 ## 总结
 
 本章在第一章的基础上搭建了半加器、全加器、多位加法器和加一计数器。

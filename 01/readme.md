@@ -1,5 +1,8 @@
 # 一、布尔逻辑
 
+> Although these chips come in different shapes and forms, they
+> are all made of the same building blocks: elementary logic gates. 
+
 ## 总结
 
 本章从与非门开始，搭建了与、或、非、异或门、数据选择器、数据分配器，以及他们的多路输入和多位扩展。

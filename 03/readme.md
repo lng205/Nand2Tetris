@@ -1,5 +1,9 @@
 # 三、时序逻辑
 
+> Computer programs use variables, arrays, and objects—abstractions that
+> persist data over time. Hardware platforms support this ability by offering
+> memory devices that know how to maintain state.
+
 ## 总结
 
 时序的概念使电路可以存储过去的状态，让电路中的反馈变得更加可控，并改善门的翻转时间和传输时延导致的竞争冒险问题。
