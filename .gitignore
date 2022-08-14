@@ -2,4 +2,4 @@
 *.out
 *.cmp
 *.hack
-06/*.asm
+06/**/*.asm
