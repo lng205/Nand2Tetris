@@ -2,7 +2,7 @@
 
 > Here is a machine with a finite
 > and fixed hardware that can perform an infinite number of tasks, from
-> playing games to typesetting books to driving cars. 
+> playing games to typesetting books to driving cars.
 
 ## 总结
 
@@ -14,7 +14,7 @@
 
 ### 冯-诺伊曼结构
 
-相比图灵机更具实用性。由CPU和内存构成。程序和数据可分别由不同存储器构成，也可存在同一块内存中。
+相比图灵机更具实用性。由CPU和内存构成。若程序和数据可分别由不同存储器构成，则称为Harvard architecture。
 
 ### I/O
 
