@@ -2,7 +2,7 @@
 
 > Bits, however, and computing systems at large, entail a consoling
 > exception: in spite of their fantastic complexity, one can completely
-> understand how modern computers work, and how they are built. 
+> understand how modern computers work, and how they are built.
 
 如名字一样，课程由与非门开始，搭建出一套可以玩俄罗斯方块的电脑。
 
