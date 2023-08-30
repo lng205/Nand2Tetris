@@ -2,4 +2,5 @@
 *.out
 *.cmp
 *.hack
+*.pdf
 06/**/*.asm
