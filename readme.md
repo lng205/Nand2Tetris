@@ -17,7 +17,7 @@
 
 课程围绕作者自己写的教材进行设计([The Elements of Computing Systems](https://www.nand2tetris.org/book))。
 
-21年刚刚再版了一次，Z-library可[下载](https://zh.singlelogin.re/book/15103557/161589/the-elements-of-computing-systems-building-a-modern-computer-from-first-principles.html)。注意官网的章节节选自旧版。
+21年刚刚再版了一次，原文语言简明易懂，国内也引入了中文翻译版本。
 
 作者还做了一套教学视频在Coursera上。不过自己还是更喜欢读教材+做作业的方式。
 
@@ -25,7 +25,7 @@
 
 配套内容十分完善，包括专门设计的硬件描述语言、测试脚本语言、算术逻辑单元、汇编语言、高级语言和操作系统，还有一整套仿真程序。
 
-课程的所有作业所需工具加起来不超过1M，所有作业均可在电脑上完成。
+仿真程序2024年更新了[网页端IDE](https://nand2tetris.github.io/web-ide)，试了一下十分好用。现在也不需要下载软件了。
 
 课程所有相关内容均开源。赞美作者，赞美互联网精神。
 
