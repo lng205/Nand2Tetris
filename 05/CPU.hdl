@@ -39,33 +39,40 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Set instrucBuf = 0 when instruction[15] == 0;
-    Mux16(a=false, b=instruction, sel=instruction[15], out[0]=instructBuf0,
-          out[1]=instructBuf1, out[2]=instructBuf2, out[4]=instructBuf4);
+    // if instruction[12]: Select inM
+    Mux16(a=A, b=inM, sel=instruction[12], out=ALUyIn);
 
     // Calc
-    ALU(x=D, y=A, zx=instruction[11], nx=instruction[10]
-                , zy=instruction[9], ny=instruction[8]
-                , f =instruction[7], no=instruction[6]
-                , out=C, out=outM, zr=zr, ng=ng);
+    ALU(
+        x=D,
+        y=ALUyIn,
+        zx=instruction[11],
+        nx=instruction[10],
+        zy=instruction[9],
+        ny=instruction[8],
+        f =instruction[7],
+        no=instruction[6],
+        out=ALUOut, out=outM, zr=zr, ng=ng
+        );
 
+    // Set instrucBuf = 0 when instruction[15] == 0;
+    Mux16(
+        a=false, b=instruction, sel=instruction[15],
+        out[0]=instructBuf0,
+        out[1]=instructBuf1,
+        out[2]=instructBuf2,
+        out[3]=writeM,
+        out[4]=loadD
+        );
 
-    // if instruction[15] and instruction[3]: writeM = 1
-    And(a=instruction[15], b=instruction[3], out=writeM);
-
-    // if instrucBuf[4]: D = C
-    DRegister(in=C, load=instructBuf4, out=D);
+    DRegister(in=ALUOut, load=loadD, out=D);
 
     // if not instruction[15]: A = instruction 
-    // elif instruction[5]: A = C
+    // elif instruction[5]: A = ALUOut
     Not(in=instruction[15], out=instruct15Not);
     Or(a=instruct15Not, b=instruction[5], out=lA);
-    Mux16(a=instruction, b=C, sel=instruction[15], out=iA);
-    ARegister(in=iA, load=lA, out[0..14]=addressM, out=oA);
-
-    // if instruction[12]: Select inM
-    Mux16(a=oA, b=inM, sel=instruction[12], out=A);
-
+    Mux16(a=instruction, b=ALUOut, sel=instruction[15], out=iA);
+    ARegister(in=iA, load=lA, out[0..14]=addressM, out=A);
 
     // Set pc when (C <, =, > 0) based on instructBuf[0..2]
     And(a=instructBuf2, b=ng, out=lpc1);
