@@ -44,10 +44,9 @@
     D;JEQ
 
 (LOOP_BLACK)
-    // n = n - 1
+    // n = n - 1, D = M
     @n
-    M=M-1
-    D=M
+    MD=M-1
 
     // *(SCREEN + n) = -1
     @SCREEN
@@ -65,10 +64,9 @@
     0;JMP
 
 (LOOP_WHITE)
-    // n = n - 1
+    // n = n - 1, D = M
     @n
-    M=M-1
-    D=M
+    MD=M-1
 
     // *(SCREEN + n) = 0
     @SCREEN
