@@ -10,7 +10,7 @@ def main():
         f = []
         line_counter = 0
         for line in file_in:
-            l = re.sub("//.*|\s", "", line).strip()
+            l = re.sub("//.*", "", line).strip()
             if l:
                 if l[0] == '(':
                     syms[l[1:-1]] = line_counter
