@@ -476,7 +476,7 @@ class Writer:
 
 def main():
     if len(sys.argv) != 2:
-        sys.exit("Usage: python vm.py FILENAME.vm")
+        sys.exit("Usage: python vm.py FILENAME.vm or python vm.py DIRECTORY")
 
     path = sys.argv[1]
     if os.path.isdir(path):
