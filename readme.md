@@ -59,3 +59,8 @@
 > who develop compilers, virtual machines, and operating systems.
 
 在HACK上进行软件开发，设计高级语言，虚拟机和操作系统，最终设计并运行俄罗斯方块这样的图形游戏。
+
+
+### [Week7](./07/readme.md)
+
+### [Week8](./08/readme.md)
