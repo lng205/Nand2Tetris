@@ -102,4 +102,4 @@
 
 - 汇编的debug过程较为繁琐，设计时需仔细检查。
 
-![alt text](images/result.png)
+![alt text](../images/Ch0701_result.png)

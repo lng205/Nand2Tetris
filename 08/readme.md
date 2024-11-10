@@ -29,7 +29,7 @@
 
 ## 函数调用
 
-![alt text](stack.png)
+![alt text](../images/Ch0801_stack.png)
 
 编译器后端需要插入额外的汇编指令，来实现函数声明、调用和返回需要的栈操作。
 
@@ -43,7 +43,7 @@
 
 ---
 
-![alt text](implementation.png)
+![alt text](../images/Ch0802_implementation.png)
 
 函数调用部分实现较为复杂，好在书中给出了具体的伪代码实现。后端编译器需要通过指令完成的额外动作如图所示。
 
@@ -97,6 +97,6 @@
 
 汇编指令的调试难度极大。一个技巧是在调试复杂的函数调用时，只关注栈内存的变化，通过当前栈顶的参数来定位程序处于哪个状态。
 
-![alt text](Fibonacci.png)
+![alt text](../images/Ch0803_result.png)
 
 我们用门电路实现了计算斐波那契数列的机器！
