@@ -1,0 +1,18 @@
+class Main {
+    function void main() {
+        var int n;
+        let n = Keyboard.readInt("n = ?");
+        let n = Main.fib(n);
+        do Output.printInt(n);
+        return;
+    }
+
+    function int fib(int n) {
+        if (n < 2) {
+            return n;
+        }
+        else {
+            return Main.fib(n-1) + Main.fib(n-2);
+        }
+    }
+}

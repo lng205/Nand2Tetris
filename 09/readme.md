@@ -28,6 +28,14 @@ Jack共有4种变量类型：`Class`, `Field`, `Local`, `Parameter`。
 
 ![alt text](../images/Ch0902_variables.png)
 
+### 函数
+
+`function`, `constructor`和`method`是Jack中可用的三种函数类型。
+
+`function`和`constructor`均采用`className.functionName`的形式来调用。
+
+调用某个对象的方法需要使用`objectName.methodName`的形式，调用自身的方法则直接使用`methodName`，等价于`this.methodName`。
+
 ## OS
 
 OS的API对象提供了一些基本的功能，包括：`Math`, `String`, `Array`, `Output`, `Screen`, `Keyboard`, `Memory`, `Sys`。
@@ -59,3 +67,7 @@ windows下使用`compiler.bat /？`可以看到帮助信息。
 将编译后的文件夹上传到VM模拟器中，即可运行编译后的程序。VM模拟器的执行VM代码时的性能已经足够运行游戏这样的交互式应用了。
 
 也可进一步使用VM translator将VM代码翻译为汇编代码，再使用汇编器将汇编代码翻译为二进制代码，并使用硬件模拟器运行。
+
+## 代码
+
+基于上一章印象深刻的fibonacci写了个Jack程序，非常简单，甚至没有用上类的特性。
