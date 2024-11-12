@@ -2,3 +2,4 @@
 *.out
 *.cmp
 *.hack
+__pycache__/
