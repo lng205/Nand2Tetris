@@ -1,5 +1,2 @@
-*.tst
-*.out
-*.cmp
-*.hack
 __pycache__/
+.vscode/
