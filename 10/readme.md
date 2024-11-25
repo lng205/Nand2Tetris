@@ -155,9 +155,7 @@ Jack语法的推导从Class开始，Class包含了ClassVarDec和SubroutineDec。
 
 - 语法解析的实现基本按照给出的API逐个实现即可。书中的设计通过高度的抽象和递归，将复杂的语法结构分解为简单的递归调用。
 
-- term语法中无法仅通过当前符号判断要选择的产生式，此时需要向前看一个符号。
-
-- 另一个实现时的技巧是将subroutineCall视为一个term语句，直接调用compileTerm即可。
+- Jack中一处不符合LL(1)文法的特例是term语句。term语法中无法仅通过当前符号判断要选择的产生式，此时需要向前看一个符号。此时有可能在消耗掉第一个id之后开始处理subroutineCall，因此这不适合作为一个完整的API实现。
 
 ## 测试
 
@@ -165,7 +163,7 @@ Jack语法的推导从Class开始，Class包含了ClassVarDec和SubroutineDec。
 
 ![alt text](../images/Ch1002_textComp.png)
 
-- 也可以直接使用`git diff`命令来比较两个XML文件的差异。
+- 也可以直接使用编辑器（VSCODE）的compare功能来比较两个XML文件的差异。
 
 ## 补充
 

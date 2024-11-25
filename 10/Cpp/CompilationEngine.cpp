@@ -33,7 +33,15 @@ void CompilationEngine::process(std::string str) {
             break;
         case TokenType::SYMBOL:
             if (tokenizer.symbol() == str[0]) {
-                output << "<symbol> " << str << " </symbol>\n";
+                if (str == "<") {
+                    output << "<symbol> &lt; </symbol>\n";
+                } else if (str == ">") {
+                    output << "<symbol> &gt; </symbol>\n";
+                } else if (str == "&") {
+                    output << "<symbol> &amp; </symbol>\n";
+                } else {
+                    output << "<symbol> " << str << " </symbol>\n";
+                }
             }
             break;
         case TokenType::IDENTIFIER:
@@ -76,6 +84,7 @@ void CompilationEngine::compileClassVarDec() {
         process(tokenizer.identifier());
     }
     process(";");
+    output << "</classVarDec>\n";
 }
 
 void CompilationEngine::compileSubroutine() {
@@ -217,8 +226,9 @@ void CompilationEngine::compileWhile() {
 void CompilationEngine::compileDo() {
     output << "<doStatement>\n";
     process("do");
-    // subroutineCall is included in term
-    compileTerm();
+    // consume the first identifier
+    process(tokenizer.identifier());
+    compileSubroutineCall();
     process(";");
     output << "</doStatement>\n";
 }
@@ -291,7 +301,7 @@ void CompilationEngine::compileTerm() {
 
 void CompilationEngine::compileSubroutineCall() {
     // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
-    process(tokenizer.identifier());
+    // the first identifier has been consumed to determine the type of the term
     if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '.') {
         process(".");
         process(tokenizer.identifier());
