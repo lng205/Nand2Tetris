@@ -145,7 +145,19 @@ F -> a
 
 - 由于Jack的词法分析是一个相对简单的映射过程，我们可以使用Python的re库来实现`Tokenizer`。
 
-- 此外，本项目也给出了使用C++实现的手写词法解析器。其基本算法是逐个字符向右扫描，并记录已知的最长匹配，当能确定当前词法单元时将其记录，并回到词法单元的下一个字符继续扫描。
+- 此外，本项目给出了使用C++（Cpp17）实现的手写词法解析器。其基本算法是逐个字符向右扫描，并记录已知的最长匹配，当能确定当前词法单元时将其记录，并回到词法单元的下一个字符继续扫描。
+
+### JACK语法
+
+![alt text](../images/Ch1003_JackGrammar.png)
+
+Jack语法的推导从Class开始，Class包含了ClassVarDec和SubroutineDec。SubroutineDec包含了Function和Method，Function包含了FunctionName、ParameterList、FunctionBody等。
+
+- 语法解析的实现基本按照给出的API逐个实现即可。书中的设计通过高度的抽象和递归，将复杂的语法结构分解为简单的递归调用。
+
+- term语法中无法仅通过当前符号判断要选择的产生式，此时需要向前看一个符号。
+
+- 另一个实现时的技巧是将subroutineCall视为一个term语句，直接调用compileTerm即可。
 
 ## 测试
 

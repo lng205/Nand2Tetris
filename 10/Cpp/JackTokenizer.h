@@ -10,8 +10,7 @@ enum TokenType {
     UNKNOWN
 };
 
-class JackTokenizer
-{
+class JackTokenizer {
 public:
     JackTokenizer(std::ifstream &input);
     bool hasMoreTokens();
