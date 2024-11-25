@@ -1,5 +1,7 @@
 # 十、编译器I
 
+> Thus, while most programmers don't develop compilers in their regular jobs, many programmers have to parse and minipulate texts and data sets of complex and varying structures.
+
 第十和第十一章的内容是完成编译器前端的开发，将高级语言代码编译为中间语言。如何将一种符号序列，按照一定的规则解析和翻译为另一种符号序列，是一个普遍的问题。
 
 - 与之前的惯例一样，本书的每一章会先介绍通用的思想和理论，之后再结合具体的语言来实现。
@@ -137,15 +139,15 @@ F -> a
 
 - `Analyzer`是解析器的入口，负责读取输入文件，调用`Tokenizer`来将输入的代码分解为单词，然后调用`CompilationEngine`来将单词转换为词法树。
 
-- 建议的实现顺序是先实现`Tokenizer`，再实现不包括表达式和数组语句的`CompilationEngine`，最后再实现表达式和数组语句的解析。中间的每一步都有对应的测试用例。
+### 词法解析
 
-    Tokenizer如果使用正则逃课则较为简单。
+解析器的主要工作是完成词法单元的切分和类型识别。
+
+    Tokenizer如果使用正则逃课则较为简单，可以使用Python的re库来实现`Tokenizer`。
 
     注意注释的语法有三种：`//`、`/* */`和`/** */`，其中多行注释的匹配自然包含了API注释`/** */`的匹配。
 
-- 由于Jack的词法分析是一个相对简单的映射过程，我们可以使用Python的re库来实现`Tokenizer`。
-
-- 此外，本项目给出了使用C++（Cpp17）实现的手写词法解析器。其基本算法是逐个字符向右扫描，并记录已知的最长匹配，当能确定当前词法单元时将其记录，并回到词法单元的下一个字符继续扫描。
+- 同时，本项目给出了使用C++（Cpp17）实现的手写词法解析器。
 
 ### JACK语法
 
@@ -156,6 +158,8 @@ Jack语法的推导从Class开始，Class包含了ClassVarDec和SubroutineDec。
 - 语法解析的实现基本按照给出的API逐个实现即可。书中的设计通过高度的抽象和递归，将复杂的语法结构分解为简单的递归调用。
 
 - Jack中一处不符合LL(1)文法的特例是term语句。term语法中无法仅通过当前符号判断要选择的产生式，此时需要向前看一个符号。此时有可能在消耗掉第一个id之后开始处理subroutineCall，因此这不适合作为一个完整的API实现。
+
+- 由于Cpp的标准库没有内置的XML库，我们选择手动输出xml格式的文本，忽略了缩进，可以使用排版插件排版后再和测试用例对比。
 
 ## 测试
 

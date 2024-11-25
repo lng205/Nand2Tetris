@@ -1,0 +1,37 @@
+# 十一、编译器II
+
+> Most programmers take compilers for granted. But if you stop to think about it, the ability to translate a high-level program into binary code is almost like magic.
+
+本章的目标是实现JACK语言编译器前端中的代码生成部分。第十章完成了JACK语言编译器前端的解析部分，将输入的高级语言代码转换为结构化的词法树。本章的目标是将词法树转换为目标语言代码。
+
+本节涉及变量名称表的设计，各种语法的翻译，编译器对操作系统API的调用，以及对面向对象语言的编译。
+
+## 变量名称表
+
+在VM语言中实际上没有用户自定义的变量名称的概念，只有栈操作。但在高级语言中，变量名称是一个重要的概念。编译器需要将变量名称映射到内存地址，以便在编译时和运行时能够正确地访问变量。
+
+由于目标语言是VM语言，我们需要映射的目标内存也是VM中的虚拟内存，即`static`、`this`、`local`、`argument`等。
+
+此外，子程序（函数/方法）的参数和局部变量也需要映射到VM的内存中。
+
+![alt text](../images/Ch1101_variables.png)
+
+## 表达式
+
+编译表达式的核心是分解和嵌套。
+
+![alt text](../images/Ch1102_expression.png)
+
+## 对象
+
+对象内存的一个重要特点是，构造器创建对象时会通过内存的堆区分配内存。
+
+栈区变量的生命周期是跟子进程同步的，当函数返回时，栈区变量会被销毁。
+
+而堆区变量的生命周期是独立的，需要手动释放内存，或是由垃圾回收器回收。
+
+当调用构造器创建对象时，当前栈内得到的是对对象的引用，即对象的内存地址。
+
+![alt text](../images/Ch1103_object.png)
+
+堆区的内存分配时在运行时动态确定的，这需要在物理内存中寻找可用的内存块，这个任务由操作系统完成。JACK的OS提供了`Memory.alloc(size)`函数来分配内存。

@@ -30,7 +30,7 @@
 
 一个只读寄存器。
 
-![Fig5.6](../images/Figure%205.6.png)
+![Fig5.6](../images/Ch0501_address.png)
 
 ### Boot
 
