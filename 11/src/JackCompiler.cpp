@@ -7,9 +7,14 @@
 namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) {
-    std::string path = argv[1];
-    std::vector<std::string> files;
+    std::string path;
+    if (argc < 2) {
+        path = ".";
+    } else {
+        path = argv[1];
+    }
 
+    std::vector<std::string> files;
     if (fs::is_directory(path)) {
         for (const auto& entry : fs::directory_iterator(path)) {
             if (entry.path().extension() == ".jack") {
@@ -26,7 +31,6 @@ int main(int argc, char* argv[]) {
         std::ofstream output(file.substr(0, file.find_last_of('.')) + ".vm");
         CompilationEngine engine(tokenizer, output);
         engine.compileClass();
-        input.close();
     }
     return 0;
 }

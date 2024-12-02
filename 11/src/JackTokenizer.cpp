@@ -1,4 +1,3 @@
-#include <fstream>
 #include "JackTokenizer.h"
 #include <algorithm>
 

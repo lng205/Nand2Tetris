@@ -295,6 +295,8 @@ void CompilationEngine::compileTerm() {
                 process(std::string{tokenizer.symbol()});
                 compileTerm();
             }
+        case TokenType::UNKNOWN:
+            break;
     };
     output << "</term>\n";
 }
