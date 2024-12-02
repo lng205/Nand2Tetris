@@ -56,8 +56,7 @@
 
 ## 下半部分
 
-> So, who are
-> the good souls who turn high-level programming into an advanced
+> So, who are the good souls who turn high-level programming into an advanced
 > technology indistinguishable from magic? They are the software wizards
 > who develop compilers, virtual machines, and operating systems.
 

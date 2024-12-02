@@ -2,7 +2,7 @@
 
 > Thus, while most programmers don't develop compilers in their regular jobs, many programmers have to parse and minipulate texts and data sets of complex and varying structures.
 
-第十和第十一章的内容是完成编译器前端的开发，将高级语言代码编译为中间语言。如何将一种符号序列，按照一定的规则解析和翻译为另一种符号序列，是一个普遍的问题。
+第十和第十一章的内容是完成编译器前端的开发，将高级语言代码编译为中间语言。这本质上是将一种符号序列，按照一定的规则，解析和翻译为另一种符号序列。本章的实现再次展示了抽象和递归的威力。
 
 - 与之前的惯例一样，本书的每一章会先介绍通用的思想和理论，之后再结合具体的语言来实现。
 
