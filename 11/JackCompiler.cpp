@@ -22,8 +22,8 @@ int main(int argc, char* argv[]) {
 
     for (const auto& file : files) {
         std::ifstream input(file);
-        std::ofstream output(file.substr(0, file.find_last_of('.')) + "_read.xml");
         JackTokenizer tokenizer(input);
+        std::ofstream output(file.substr(0, file.find_last_of('.')) + ".vm");
         CompilationEngine engine(tokenizer, output);
         engine.compileClass();
         input.close();
