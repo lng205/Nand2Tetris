@@ -1,57 +1,23 @@
 #include "CompilationEngine.h"
 
-CompilationEngine::CompilationEngine(JackTokenizer &input, std::ofstream &output) : tokenizer(input), output(output) {};
-
-void CompilationEngine::compileClass()
-{
-    output << "<class>\n";
-    tokenizer.advance();
-    process("class");
-    process(tokenizer.identifier());
-    process("{");
-    // classVar must precede subroutine
-    // classVarDec*
-    while (tokenizer.tokenType() == TokenType::KEYWORD && (tokenizer.keyWord() == "static" || tokenizer.keyWord() == "field"))
-    {
-        compileClassVarDec();
-    }
-    // subroutineDec*
-    while (tokenizer.tokenType() == TokenType::KEYWORD && (tokenizer.keyWord() == "constructor" || tokenizer.keyWord() == "function" || tokenizer.keyWord() == "method"))
-    {
-        compileSubroutine();
-    }
-    process("}");
-    output << "</class>\n";
-}
+CompilationEngine::CompilationEngine(JackTokenizer &input, std::ofstream &output) : tokenizer(input), writer(output) {};
 
 void CompilationEngine::process(std::string str) {
     switch (tokenizer.tokenType()) {
         case TokenType::KEYWORD:
             if (tokenizer.keyWord() == str) {
-                output << "<keyword> " << str << " </keyword>\n";
             }
             break;
         case TokenType::SYMBOL:
             if (tokenizer.symbol() == str[0]) {
-                if (str == "<") {
-                    output << "<symbol> &lt; </symbol>\n";
-                } else if (str == ">") {
-                    output << "<symbol> &gt; </symbol>\n";
-                } else if (str == "&") {
-                    output << "<symbol> &amp; </symbol>\n";
-                } else {
-                    output << "<symbol> " << str << " </symbol>\n";
-                }
             }
             break;
         case TokenType::IDENTIFIER:
             if (tokenizer.identifier() == str) {
-                output << "<identifier> " << str << " </identifier>\n";
             }
             break;
         case TokenType::STRING_CONST:
             if (tokenizer.stringVal() == str) {
-                output << "<stringConstant> " << str << " </stringConstant>\n";
             }
             break;
         default:
@@ -60,102 +26,141 @@ void CompilationEngine::process(std::string str) {
     tokenizer.advance();
 }
 
-void CompilationEngine::processType() {
-    if (tokenizer.tokenType() == TokenType::KEYWORD) {
-        // "int", "char", "boolean"
-        process(tokenizer.keyWord());
-    } else {
-        // className
-        process(tokenizer.identifier());
+std::string CompilationEngine::processType() {
+    std::string type;
+    // "int" or "char" or "boolean" or className
+    type = tokenizer.tokenType() == TokenType::KEYWORD ? tokenizer.keyWord() : tokenizer.identifier();
+    process(type);
+    return type;
+}
+
+void CompilationEngine::compileClass()
+{
+    classSyms.reset();
+    labelCount = 0;
+
+    tokenizer.advance();
+    process("class");
+
+    // className
+    className = tokenizer.identifier();
+    process(tokenizer.identifier());
+
+    process("{");
+    // classVar must precede subroutine
+    while (tokenizer.tokenType() == TokenType::KEYWORD && (tokenizer.keyWord() == "static" || tokenizer.keyWord() == "field"))
+    {
+        // classVarDec*
+        compileClassVarDec();
     }
+    while (tokenizer.tokenType() == TokenType::KEYWORD && (tokenizer.keyWord() == "constructor" || tokenizer.keyWord() == "function" || tokenizer.keyWord() == "method"))
+    {
+        // subroutineDec*
+        compileSubroutine();
+    }
+    process("}");
 }
 
 void CompilationEngine::compileClassVarDec() {
-    output << "<classVarDec>\n";
     // "static" or "field"
+    Kind kind = tokenizer.keyWord() == "static" ? Kind::STATIC : Kind::FIELD;
     process(tokenizer.keyWord());
     // type
-    processType();
+    std::string type = processType();
     // varName
+    classSyms.define(tokenizer.identifier(), type, kind);
     process(tokenizer.identifier());
-    // (',' varName)*
     while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
+        // (',' varName)*
         process(",");
+        classSyms.define(tokenizer.identifier(), type, kind);
         process(tokenizer.identifier());
     }
     process(";");
-    output << "</classVarDec>\n";
 }
 
 void CompilationEngine::compileSubroutine() {
-    // subroutineDec
-    output << "<subroutineDec>\n";
+    subroutineSyms.reset();
     // "constructor" or "function" or "method"
+    subroutineType = tokenizer.keyWord();
     process(tokenizer.keyWord());
-    // "void" or type
+
     if (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "void") {
         process("void");
     } else {
         processType();
     }
+
     // subroutineName
+    subroutineName = tokenizer.identifier();
+    if (subroutineType == "method") {
+        subroutineSyms.define("this", subroutineName, Kind::ARG);
+    }
     process(tokenizer.identifier());
+
     process("(");
     compileParameterList();
     process(")");
+
     compileSubroutineBody();
-    output << "</subroutineDec>\n";
 }
 
 void CompilationEngine::compileParameterList() {
-    output << "<parameterList>\n";
-    // ((type varName) (',' type varName)*)?
     // FOLLOW(parameterList) = {")"}
     if (tokenizer.tokenType() != TokenType::SYMBOL) {
-        processType();
+        // ((type varName) (',' type varName)*)?
+        std::string type = processType();
         // varName
+        subroutineSyms.define(tokenizer.identifier(), type, Kind::ARG);
         process(tokenizer.identifier());
-        // (',' type varName)*
         while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
+            // (',' type varName)*
             process(",");
-            processType();
+            type = processType();
+            subroutineSyms.define(tokenizer.identifier(), type, Kind::ARG);
             process(tokenizer.identifier());
         }
     }
-    output << "</parameterList>\n";
 }
 
 void CompilationEngine::compileSubroutineBody() {
-    output << "<subroutineBody>\n";
     process("{");
     // varDec*
     while (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "var") {
         compileVarDec();
     }
+    writer.writeFunction(className + "." + subroutineName, subroutineSyms.varCount(Kind::VAR));
+    if (subroutineType == "method") {
+        writer.writePush("argument", 0);
+        writer.writePop("pointer", 0);
+    } else if (subroutineType == "constructor") {
+        writer.writePush("constant", classSyms.varCount(Kind::FIELD));
+        writer.writeCall("Memory.alloc", 1);
+        writer.writePop("pointer", 0);
+    }
+
     compileStatements();
     process("}");
-    output << "</subroutineBody>\n";
 }
 
 void CompilationEngine::compileVarDec() {
-    output << "<varDec>\n";
     // "var"
     process("var");
     // type
-    processType();
+    std::string type = processType();
     // varName
+    subroutineSyms.define(tokenizer.identifier(), type, Kind::VAR);
     process(tokenizer.identifier());
-    // (',' varName)*
     while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
+        // (',' varName)*
         process(",");
+        subroutineSyms.define(tokenizer.identifier(), type, Kind::VAR);
         process(tokenizer.identifier());
     }
     process(";");
-    output << "</varDec>\n";
 }
 
 void CompilationEngine::compileStatements() {
-    output << "<statements>\n";
     while (tokenizer.tokenType() == TokenType::KEYWORD) {
         if (tokenizer.keyWord() == "let") {
             compileLet();
@@ -171,48 +176,76 @@ void CompilationEngine::compileStatements() {
             break;
         }
     }
-    output << "</statements>\n";
 }
 
 void CompilationEngine::compileLet() {
-    output << "<letStatement>\n";
     process("let");
     // varName
+    std::string varName = tokenizer.identifier();
     process(tokenizer.identifier());
-    // array
-    // ('[' expression ']')?
-    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '[') {
+    std::string varKind;
+    int varIndex;
+    if (subroutineSyms.kindOf(varName) != "NONE") {
+        varKind = subroutineSyms.kindOf(varName);
+        varIndex = subroutineSyms.indexOf(varName);
+    }
+    else {
+        varKind = classSyms.kindOf(varName);
+        varIndex = classSyms.indexOf(varName);
+    }
+
+    bool isArray = (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '[');
+    if (isArray) {
+        writer.writePush(varKind, varIndex);
+
+        // ('[' expression ']')?
         process("[");
         compileExpression();
         process("]");
+
+        // calculate the address
+        writer.writeArithmetic("add");
     }
     process("=");
     compileExpression();
+    if (isArray) {
+        writer.writePop("temp", 0);
+        writer.writePop("pointer", 1);
+        writer.writePush("temp", 0);
+        writer.writePop("that", 0);
+    } else {
+        writer.writePop(varKind, varIndex);
+    }
     process(";");
-    output << "</letStatement>\n";
 }
 
 void CompilationEngine::compileIf() {
-    output << "<ifStatement>\n";
     process("if");
+
     process("(");
     compileExpression();
     process(")");
+    writer.writeArithmetic("not");
+    writer.writeIf("L" + std::to_string(labelCount));
+
     process("{");
     compileStatements();
     process("}");
+    writer.writeGoto("L" + std::to_string(labelCount + 1));
+
     // else
     if (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "else") {
+        writer.writeLabel("L" + std::to_string(labelCount));
         process("else");
         process("{");
         compileStatements();
         process("}");
     }
-    output << "</ifStatement>\n";
+    writer.writeLabel("L" + std::to_string(labelCount + 1));
+    labelCount += 2;
 }
 
 void CompilationEngine::compileWhile() {
-    output << "<whileStatement>\n";
     process("while");
     process("(");
     compileExpression();
@@ -220,7 +253,6 @@ void CompilationEngine::compileWhile() {
     process("{");
     compileStatements();
     process("}");
-    output << "</whileStatement>\n";
 }
 
 void CompilationEngine::compileDo() {

@@ -1,6 +1,8 @@
 #include <fstream>
 #include <unordered_set>
 #include "JackTokenizer.h"
+#include "SymbolTable.h"
+#include "VMWriter.h"
 
 class CompilationEngine {
 public:
@@ -23,11 +25,17 @@ public:
 
 private:
     JackTokenizer &tokenizer;
-    std::ofstream &output;
-    void process(std::string str);
-    void processType();
+    VMWriter writer;
+    std::string className;
+    SymbolTable classSyms = SymbolTable();
+    SymbolTable subroutineSyms = SymbolTable();
+    std::string subroutineName;
+    std::string subroutineType;
     std::unordered_set<std::string> opSet = {
         "+", "-", "*", "/", "&", "|", "<", ">", "="
     };
+    int labelCount = 0;
+    std::string processType();
+    void process(std::string str);
     void compileSubroutineCall();
 };

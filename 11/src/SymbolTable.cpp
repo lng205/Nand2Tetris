@@ -1,5 +1,25 @@
 #include "SymbolTable.h"
 
+SymbolTable::SymbolTable() {
+    count[Kind::STATIC] = 0;
+    count[Kind::FIELD] = 0;
+    count[Kind::ARG] = 0;
+    count[Kind::VAR] = 0;
+}
+
+std::string SymbolTable::kindToString(Kind kind) {
+    switch (kind) {
+        case Kind::STATIC:
+            return "static";
+        case Kind::FIELD:
+            return "field";
+        case Kind::ARG:
+            return "argument";
+        case Kind::VAR:
+            return "local";
+    }
+}
+
 void SymbolTable::reset() {
     table.clear();
     count.clear();
@@ -14,11 +34,11 @@ int SymbolTable::varCount(Kind kind) {
     return count[kind];
 }
 
-std::optional<Kind> SymbolTable::kindOf(std::string name) {
+std::string SymbolTable::kindOf(std::string name) {
     if (table.find(name) == table.end()) {
-        return std::nullopt;
+        return "NONE";
     }
-    return std::get<1>(table[name]);
+    return kindToString(std::get<1>(table[name]));
 }
 
 std::string SymbolTable::typeOf(std::string name) {

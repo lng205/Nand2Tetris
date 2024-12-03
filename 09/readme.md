@@ -36,6 +36,8 @@ Jack共有4种变量类型：`Class`, `Field`, `Local`, `Parameter`。
 
 调用某个对象的方法需要使用`objectName.methodName`的形式，调用自身的方法则直接使用`methodName`，等价于`this.methodName`。
 
+- 注意`function`和`method`的区别：在JACK中，function表示class的静态方法，method表示class的实例方法。
+
 ## OS
 
 OS的API对象提供了一些基本的功能，包括：`Math`, `String`, `Array`, `Output`, `Screen`, `Keyboard`, `Memory`, `Sys`。
