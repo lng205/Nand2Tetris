@@ -2,52 +2,19 @@
 
 CompilationEngine::CompilationEngine(JackTokenizer &input, std::ofstream &output) : tokenizer(input), writer(output) {};
 
-void CompilationEngine::process(std::string str) {
-    switch (tokenizer.tokenType()) {
-        case TokenType::KEYWORD:
-            if (tokenizer.keyWord() == str) {
-            }
-            break;
-        case TokenType::SYMBOL:
-            if (tokenizer.symbol() == str[0]) {
-            }
-            break;
-        case TokenType::IDENTIFIER:
-            if (tokenizer.identifier() == str) {
-            }
-            break;
-        case TokenType::STRING_CONST:
-            if (tokenizer.stringVal() == str) {
-            }
-            break;
-        default:
-            break;
-    }
-    tokenizer.advance();
-}
-
-std::string CompilationEngine::processType() {
-    std::string type;
-    // "int" or "char" or "boolean" or className
-    type = tokenizer.tokenType() == TokenType::KEYWORD ? tokenizer.keyWord() : tokenizer.identifier();
-    process(type);
-    return type;
-}
-
 void CompilationEngine::compileClass()
 {
     classSyms.reset();
     labelCount = 0;
 
-    tokenizer.advance();
     process("class");
 
     // className
     className = tokenizer.identifier();
-    process(tokenizer.identifier());
+    tokenizer.advance();
 
+    // classVarDec must precede subroutine
     process("{");
-    // classVar must precede subroutine
     while (tokenizer.tokenType() == TokenType::KEYWORD && (tokenizer.keyWord() == "static" || tokenizer.keyWord() == "field"))
     {
         // classVarDec*
@@ -62,41 +29,47 @@ void CompilationEngine::compileClass()
 }
 
 void CompilationEngine::compileClassVarDec() {
+    // ("static" | "field") type varName (',' varName)* ';'
+
     // "static" or "field"
     Kind kind = tokenizer.keyWord() == "static" ? Kind::STATIC : Kind::FIELD;
-    process(tokenizer.keyWord());
+    tokenizer.advance();
+
     // type
     std::string type = processType();
+
     // varName
     classSyms.define(tokenizer.identifier(), type, kind);
-    process(tokenizer.identifier());
+    tokenizer.advance();
+
     while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
         // (',' varName)*
         process(",");
+        // varName
         classSyms.define(tokenizer.identifier(), type, kind);
-        process(tokenizer.identifier());
+        tokenizer.advance();
     }
     process(";");
 }
 
 void CompilationEngine::compileSubroutine() {
-    subroutineSyms.reset();
-    // "constructor" or "function" or "method"
-    subroutineType = tokenizer.keyWord();
-    process(tokenizer.keyWord());
+    // ("constructor" | "function" | "method") ("void" | type) subroutineName '(' parameterList ')' subroutineBody
 
-    if (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "void") {
-        process("void");
-    } else {
-        processType();
-    }
+    subroutineSyms.reset();
+
+    // ("constructor" | "function" | "method")
+    subroutineType = tokenizer.keyWord();
+    tokenizer.advance();
+
+    // ("void" | type)
+    tokenizer.advance();
 
     // subroutineName
     subroutineName = tokenizer.identifier();
     if (subroutineType == "method") {
-        subroutineSyms.define("this", subroutineName, Kind::ARG);
+        subroutineSyms.define("this", className, Kind::ARG);
     }
-    process(tokenizer.identifier());
+    tokenizer.advance();
 
     process("(");
     compileParameterList();
@@ -112,13 +85,13 @@ void CompilationEngine::compileParameterList() {
         std::string type = processType();
         // varName
         subroutineSyms.define(tokenizer.identifier(), type, Kind::ARG);
-        process(tokenizer.identifier());
+        tokenizer.advance();
         while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
             // (',' type varName)*
             process(",");
             type = processType();
             subroutineSyms.define(tokenizer.identifier(), type, Kind::ARG);
-            process(tokenizer.identifier());
+            tokenizer.advance();
         }
     }
 }
@@ -129,6 +102,7 @@ void CompilationEngine::compileSubroutineBody() {
     while (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "var") {
         compileVarDec();
     }
+
     writer.writeFunction(className + "." + subroutineName, subroutineSyms.varCount(Kind::VAR));
     if (subroutineType == "method") {
         writer.writePush("argument", 0);
@@ -150,12 +124,12 @@ void CompilationEngine::compileVarDec() {
     std::string type = processType();
     // varName
     subroutineSyms.define(tokenizer.identifier(), type, Kind::VAR);
-    process(tokenizer.identifier());
+    tokenizer.advance();
     while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
         // (',' varName)*
         process(",");
         subroutineSyms.define(tokenizer.identifier(), type, Kind::VAR);
-        process(tokenizer.identifier());
+        tokenizer.advance();
     }
     process(";");
 }
@@ -182,7 +156,7 @@ void CompilationEngine::compileLet() {
     process("let");
     // varName
     std::string varName = tokenizer.identifier();
-    process(tokenizer.identifier());
+    tokenizer.advance();
     std::string varKind;
     int varIndex;
     if (subroutineSyms.kindOf(varName) != "NONE") {
@@ -246,73 +220,151 @@ void CompilationEngine::compileIf() {
 }
 
 void CompilationEngine::compileWhile() {
+    writer.writeLabel("L" + std::to_string(labelCount));
     process("while");
+
     process("(");
     compileExpression();
     process(")");
+    writer.writeArithmetic("not");
+    writer.writeIf("L" + std::to_string(labelCount + 1));
+
     process("{");
     compileStatements();
     process("}");
+    writer.writeGoto("L" + std::to_string(labelCount));
+
+    writer.writeLabel("L" + std::to_string(labelCount + 1));
+    labelCount += 2;
 }
 
 void CompilationEngine::compileDo() {
-    output << "<doStatement>\n";
     process("do");
     // consume the first identifier
-    process(tokenizer.identifier());
-    compileSubroutineCall();
+    compileSubroutineCall(tokenizer.identifier());
+    tokenizer.advance();
+
+    writer.writePop("temp", 0);
     process(";");
-    output << "</doStatement>\n";
 }
 
 void CompilationEngine::compileReturn() {
-    output << "<returnStatement>\n";
     process("return");
     // expression?
-    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ';') {
-        process(";");
-    } else {
+    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() != ';') {
         compileExpression();
-        process(";");
+    } else {
+        // return void
+        writer.writePush("constant", 0);
     }
-    output << "</returnStatement>\n";
+    writer.writeReturn();
+
+    process(";");
 }
 
 void CompilationEngine::compileExpression() {
-    output << "<expression>\n";
     compileTerm();
     // (op term)*
     while (tokenizer.tokenType() == TokenType::SYMBOL && opSet.find(std::string{tokenizer.symbol()}) != opSet.end()) {
-        process(std::string{tokenizer.symbol()});
+        char op = tokenizer.symbol();
+        tokenizer.advance();
         compileTerm();
+        switch (op) {
+            case '+':
+                writer.writeArithmetic("add");
+                break;
+            case '-':
+                writer.writeArithmetic("sub");
+                break;
+            case '*':
+                writer.writeCall("Math.multiply", 2);
+                break;
+            case '/':
+                writer.writeCall("Math.divide", 2);
+                break;
+            case '&':
+                writer.writeArithmetic("and");
+                break;
+            case '|':
+                writer.writeArithmetic("or");
+                break;
+            case '<':
+                writer.writeArithmetic("lt");
+                break;
+            case '>':
+                writer.writeArithmetic("gt");
+                break;
+            case '=':
+                writer.writeArithmetic("eq");
+                break;
+        }
     }
-    output << "</expression>\n";
 }
 
 void CompilationEngine::compileTerm() {
-    output << "<term>\n";
+    // write vm commands that push the evaluated value to the stack
+    std::string token;
     switch (tokenizer.tokenType()) {
         case TokenType::INT_CONST:
-            output << "<integerConstant> " << tokenizer.intVal() << " </integerConstant>\n";
+            writer.writePush("constant", tokenizer.intVal());
             tokenizer.advance();
             break;
         case TokenType::STRING_CONST:
-            process(tokenizer.stringVal());
+            token = tokenizer.stringVal();
+            tokenizer.advance();
+            writer.writePush("constant", token.length());
+            writer.writeCall("String.new", 1);
+
+            for (char c : token) {
+                writer.writePush("constant", c);
+                writer.writeCall("String.appendChar", 2);
+            }
             break;
         case TokenType::KEYWORD:
-            if (tokenizer.keyWord() == "true" || tokenizer.keyWord() == "false" || tokenizer.keyWord() == "null" || tokenizer.keyWord() == "this") {
-                process(tokenizer.keyWord());
+            token = tokenizer.keyWord();
+            tokenizer.advance();
+            if (token == "true") {
+                writer.writePush("constant", 0);
+                writer.writeArithmetic("not");
+            } else if (token == "false" || token == "null") {
+                writer.writePush("constant", 0);
+            } else if (token == "this") {
+                writer.writePush("pointer", 0);
             }
             break;
         case TokenType::IDENTIFIER:
             // varName | varName '[' expression ']' | subroutineCall
-            process(tokenizer.identifier());
+            token = tokenizer.identifier();
+            tokenizer.advance();
+
             if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '[') {
+                // varName '[' expression ']'
+                writer.writePush(subroutineSyms.kindOf(token), subroutineSyms.indexOf(token));
+
                 process("[");
                 compileExpression();
                 process("]");
+
+                writer.writeArithmetic("add");
+                writer.writePop("pointer", 1);
+                writer.writePush("that", 0);
             } else if (tokenizer.tokenType() == TokenType::SYMBOL && (tokenizer.symbol() == '(' || tokenizer.symbol() == '.')) {
-                compileSubroutineCall();
+                // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
+                compileSubroutineCall(token);
+            } else {
+                // varName
+                std::string kind;
+                int index;
+                if (subroutineSyms.kindOf(token) != "NONE") {
+                    // local variable
+                    kind = subroutineSyms.kindOf(token);
+                    index = subroutineSyms.indexOf(token);
+                } else {
+                    // class variable
+                    kind = classSyms.kindOf(token);
+                    index = classSyms.indexOf(token);
+                }
+                writer.writePush(kind, index);
             }
             break;
         case TokenType::SYMBOL:
@@ -324,40 +376,102 @@ void CompilationEngine::compileTerm() {
 
             } else if (opSet.find(std::string{tokenizer.symbol()}) != opSet.end()) {
                 // unaryOp term
-                process(std::string{tokenizer.symbol()});
+                tokenizer.advance();
                 compileTerm();
+                if (tokenizer.symbol() == '-') {
+                    writer.writeArithmetic("neg");
+                } else if (tokenizer.symbol() == '~') {
+                    writer.writeArithmetic("not");
+                }
             }
         case TokenType::UNKNOWN:
             break;
     };
-    output << "</term>\n";
-}
-
-void CompilationEngine::compileSubroutineCall() {
-    // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
-    // the first identifier has been consumed to determine the type of the term
-    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '.') {
-        process(".");
-        process(tokenizer.identifier());
-    }
-    process("(");
-    compileExpressionList();
-    process(")");
 }
 
 int CompilationEngine::compileExpressionList() {
-    output << "<expressionList>\n";
     int nArgs = 0;
     // (expression (',' expression)*)?
     if (tokenizer.tokenType() != TokenType::SYMBOL || tokenizer.symbol() != ')') {
         compileExpression();
         nArgs++;
         while (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ',') {
-            process(",");
+            // (',' expression)*
+            tokenizer.advance();
             compileExpression();
             nArgs++;
         }
     }
-    output << "</expressionList>\n";
     return nArgs;
+}
+
+void CompilationEngine::process(std::string expected) {
+    std::string actual;
+    switch (tokenizer.tokenType()) {
+        case TokenType::KEYWORD:
+            actual = tokenizer.keyWord();
+            break;
+        case TokenType::SYMBOL:
+            actual = tokenizer.symbol();
+            break;
+        default:
+            throw std::runtime_error("Unexpected token type");
+    }
+    if (actual != expected) {
+        throw std::runtime_error("Expected " + expected + ", but got " + actual);
+    }
+    tokenizer.advance();
+}
+
+std::string CompilationEngine::processType() {
+    std::string type;
+    // "int" or "char" or "boolean" or className
+    type = tokenizer.tokenType() == TokenType::KEYWORD ? tokenizer.keyWord() : tokenizer.identifier();
+    tokenizer.advance();
+    return type;
+}
+
+
+void CompilationEngine::compileSubroutineCall(std::string token) {
+    // subroutineName '(' expressionList ')' | (className | varName) '.' subroutineName '(' expressionList ')'
+    // the first token has been consumed to determine the type of the term
+
+    bool isMethod;
+    std::string calleeClass, calleeSubroutine;
+
+    // handle the prefix
+    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == '.') {
+        process(".");
+        calleeSubroutine = tokenizer.identifier();
+        tokenizer.advance();
+        // (className | varName) '.' subroutineName
+        if (subroutineSyms.kindOf(token) != "NONE") {
+            isMethod = true;
+            calleeClass = subroutineSyms.typeOf(token);
+            writer.writePush(subroutineSyms.kindOf(token), subroutineSyms.indexOf(token));
+        } else if (classSyms.kindOf(token) != "NONE") {
+            isMethod = true;
+            calleeClass = classSyms.typeOf(token);
+            writer.writePush(classSyms.kindOf(token), classSyms.indexOf(token));
+        } else {
+            // className
+            isMethod = false;
+            calleeClass = token;
+        }
+    } else {
+        // subroutineName
+        isMethod = true;
+        calleeClass = className;
+        calleeSubroutine = token;
+        writer.writePush("pointer", 0);
+    }
+
+    process("(");
+    int nArgs = compileExpressionList();
+    if (isMethod) {
+        nArgs++;
+    }
+    process(")");
+
+    writer.writeCall(calleeClass + "." + calleeSubroutine, nArgs);
 }

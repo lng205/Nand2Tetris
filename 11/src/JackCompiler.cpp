@@ -30,7 +30,11 @@ int main(int argc, char* argv[]) {
         JackTokenizer tokenizer(input);
         std::ofstream output(file.substr(0, file.find_last_of('.')) + ".vm");
         CompilationEngine engine(tokenizer, output);
-        engine.compileClass();
+
+        tokenizer.advance();
+        if (tokenizer.keyWord() == "class") {
+            engine.compileClass();
+        }
     }
     return 0;
 }

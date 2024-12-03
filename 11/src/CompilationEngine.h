@@ -35,7 +35,7 @@ private:
         "+", "-", "*", "/", "&", "|", "<", ">", "="
     };
     int labelCount = 0;
+    void process(std::string expected);
     std::string processType();
-    void process(std::string str);
-    void compileSubroutineCall();
+    void compileSubroutineCall(std::string token);
 };
