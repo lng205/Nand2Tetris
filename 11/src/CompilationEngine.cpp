@@ -241,8 +241,9 @@ void CompilationEngine::compileWhile() {
 void CompilationEngine::compileDo() {
     process("do");
     // consume the first identifier
-    compileSubroutineCall(tokenizer.identifier());
+    std::string token = tokenizer.identifier();
     tokenizer.advance();
+    compileSubroutineCall(token);
 
     writer.writePop("temp", 0);
     process(";");
