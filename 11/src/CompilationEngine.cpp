@@ -252,11 +252,11 @@ void CompilationEngine::compileDo() {
 void CompilationEngine::compileReturn() {
     process("return");
     // expression?
-    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() != ';') {
-        compileExpression();
-    } else {
+    if (tokenizer.tokenType() == TokenType::SYMBOL && tokenizer.symbol() == ';') {
         // return void
         writer.writePush("constant", 0);
+    } else {
+        compileExpression();
     }
     writer.writeReturn();
 
