@@ -207,9 +207,9 @@ void CompilationEngine::compileIf() {
     process("}");
     writer.writeGoto("L" + std::to_string(labelCount + 1));
 
-    // else
+    writer.writeLabel("L" + std::to_string(labelCount));
     if (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "else") {
-        writer.writeLabel("L" + std::to_string(labelCount));
+        // else
         process("else");
         process("{");
         compileStatements();
