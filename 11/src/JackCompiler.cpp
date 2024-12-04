@@ -7,26 +7,36 @@
 namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]) {
-    std::string path = argv[1];
-    std::vector<std::string> files;
+    std::string path;
+    if (argc < 2) {
+        path = ".";
+    } else {
+        path = argv[1];
+    }
 
+    std::vector<std::string> files;
     if (fs::is_directory(path)) {
         for (const auto& entry : fs::directory_iterator(path)) {
             if (entry.path().extension() == ".jack") {
                 files.push_back(entry.path().string());
             }
         }
-    } else {
+    } else if (fs::is_regular_file(path)) {
         files.push_back(path);
+    } else {
+        throw std::runtime_error("Invalid path");
     }
 
     for (const auto& file : files) {
         std::ifstream input(file);
-        std::ofstream output(file.substr(0, file.find_last_of('.')) + "_read.xml");
         JackTokenizer tokenizer(input);
+        std::ofstream output(file.substr(0, file.find_last_of('.')) + ".vm");
         CompilationEngine engine(tokenizer, output);
-        engine.compileClass();
-        input.close();
+
+        tokenizer.advance();
+        if (tokenizer.keyWord() == "class") {
+            engine.compileClass();
+        }
     }
     return 0;
 }
