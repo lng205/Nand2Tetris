@@ -12,7 +12,7 @@ std::string SymbolTable::kindToString(Kind kind) {
         case Kind::STATIC:
             return "static";
         case Kind::FIELD:
-            return "field";
+            return "this";
         case Kind::ARG:
             return "argument";
         case Kind::VAR:
