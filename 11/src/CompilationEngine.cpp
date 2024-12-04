@@ -194,20 +194,26 @@ void CompilationEngine::compileLet() {
 }
 
 void CompilationEngine::compileIf() {
+    // "if" '(' expression ')' '{' statements '}' ('else' '{' statements '}')?
+
+    // convert labelCount to string first incase the value changes
+    std::string L1 = "L" + std::to_string(labelCount++);
+    std::string L2 = "L" + std::to_string(labelCount++);
+
     process("if");
 
     process("(");
     compileExpression();
     process(")");
     writer.writeArithmetic("not");
-    writer.writeIf("L" + std::to_string(labelCount));
+    writer.writeIf(L1);
 
     process("{");
     compileStatements();
     process("}");
-    writer.writeGoto("L" + std::to_string(labelCount + 1));
+    writer.writeGoto(L2);
 
-    writer.writeLabel("L" + std::to_string(labelCount));
+    writer.writeLabel(L1);
     if (tokenizer.tokenType() == TokenType::KEYWORD && tokenizer.keyWord() == "else") {
         // else
         process("else");
@@ -215,27 +221,28 @@ void CompilationEngine::compileIf() {
         compileStatements();
         process("}");
     }
-    writer.writeLabel("L" + std::to_string(labelCount + 1));
-    labelCount += 2;
+    writer.writeLabel(L2);
 }
 
 void CompilationEngine::compileWhile() {
-    writer.writeLabel("L" + std::to_string(labelCount));
+    std::string L1 = "L" + std::to_string(labelCount++);
+    std::string L2 = "L" + std::to_string(labelCount++);
+
+    writer.writeLabel(L1);
     process("while");
 
     process("(");
     compileExpression();
     process(")");
     writer.writeArithmetic("not");
-    writer.writeIf("L" + std::to_string(labelCount + 1));
+    writer.writeIf(L2);
 
     process("{");
     compileStatements();
     process("}");
-    writer.writeGoto("L" + std::to_string(labelCount));
+    writer.writeGoto(L1);
 
-    writer.writeLabel("L" + std::to_string(labelCount + 1));
-    labelCount += 2;
+    writer.writeLabel(L2);
 }
 
 void CompilationEngine::compileDo() {
@@ -374,14 +381,14 @@ void CompilationEngine::compileTerm() {
                 process("(");
                 compileExpression();
                 process(")");
-
-            } else if (opSet.find(std::string{tokenizer.symbol()}) != opSet.end()) {
+            } else {
                 // unaryOp term
+                char symbol = tokenizer.symbol();
                 tokenizer.advance();
                 compileTerm();
-                if (tokenizer.symbol() == '-') {
+                if (symbol == '-') {
                     writer.writeArithmetic("neg");
-                } else if (tokenizer.symbol() == '~') {
+                } else if (symbol == '~') {
                     writer.writeArithmetic("not");
                 }
             }
