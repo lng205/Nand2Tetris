@@ -21,12 +21,10 @@ int main(int argc, char* argv[]) {
                 files.push_back(entry.path().string());
             }
         }
-        if (files.empty()) {
-            std::cerr << "No .jack files found in directory" << std::endl;
-            return 1;
-        }
-    } else {
+    } else if (fs::is_regular_file(path)) {
         files.push_back(path);
+    } else {
+        throw std::runtime_error("Invalid path");
     }
 
     for (const auto& file : files) {
