@@ -21,6 +21,10 @@ int main(int argc, char* argv[]) {
                 files.push_back(entry.path().string());
             }
         }
+        if (files.empty()) {
+            std::cerr << "No .jack files found in directory" << std::endl;
+            return 1;
+        }
     } else {
         files.push_back(path);
     }
