@@ -15,12 +15,17 @@
  * as a small filled square, indicates where the next character will be displayed.
  */
 class Output {
-
+     // Cursor position
+    static int cursorX, cursorY;
     // Character map for displaying characters
     static Array charMaps; 
 
     /** Initializes the screen, and locates the cursor at the screen's top-left. */
     function void init() {
+        let cursorX = 0;
+        let cursorY = 0;
+        do Output.initMap();
+        return;
     }
 
     // Initializes the character map array
@@ -71,7 +76,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,0,0,0,0,0,0,0,0,0,0,0);          // A ** TO BE FILLED **
+        do Output.create(65,8,28,54,99,127,127,99,99,99,0,0);          // A ** TO BE FILLED **
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -176,28 +181,104 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+        let cursorX = j;
+        let cursorY = i;
+        return;
     }
 
     /** Displays the given character at the cursor location,
      *  and advances the cursor one column forward. */
     function void printChar(char c) {
+        var Array map;
+        var int i, baseAddr;
+
+        let map = Output.getMap(c);
+        let i = 0;
+
+        // 11 rows per character
+        // 11 * 32 = 352
+        let baseAddr = 16384 + (cursorY * 352) + (cursorX / 2);
+    
+        if (cursorX & 1 = 0) {
+            // Even column
+            while (i < 11) {
+                // 0xFF00 = -1 - 255
+                do Memory.poke(baseAddr, (Memory.peek(baseAddr) & -256) | map[i]);
+                let baseAddr = baseAddr + 32;
+                let i = i + 1;
+            }
+        } else {
+            // Odd column
+            while (i < 11) {
+                // 0x00FF = 255
+                do Memory.poke(baseAddr, (Memory.peek(baseAddr) & 255) | (map[i] * 256));
+                let baseAddr = baseAddr + 32;
+                let i = i + 1;
+            }
+        }
+
+        // Advance the cursor
+        if (cursorX = 63) {
+            if (cursorY = 22) {
+                do Screen.clearScreen();
+                let cursorX = 0;
+                let cursorY = 0;
+            } else {
+                let cursorX = 0;
+                let cursorY = cursorY + 1;
+            }
+        } else {
+            let cursorX = cursorX + 1;
+        }
+
+        return;
     }
 
     /** displays the given string starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printString(String s) {
+        var int i;
+        let i = 0;
+        while (i < s.length()) {
+            do Output.printChar(s.charAt(i));
+            let i = i + 1;
+        }
+
+        return;
     }
 
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+        var String s;
+        let s = String.new(6);
+        do s.setInt(i);
+        do Output.printString(s);
+
+        return;
     }
 
     /** Advances the cursor to the beginning of the next line. */
     function void println() {
+        if (cursorY = 22) {
+            do Screen.clearScreen();
+            let cursorX = 0;
+            let cursorY = 0;
+        } else {
+            let cursorX = 0;
+            let cursorY = cursorY + 1;
+        }
+        return;
     }
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+        if (cursorX > 0) {
+            let cursorX = cursorX - 1;
+            do Output.printChar(32);
+            let cursorX = cursorX - 1;
+        }
+        
+        return;
     }
 }
