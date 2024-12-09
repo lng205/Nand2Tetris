@@ -1,0 +1,37 @@
+function Memory.init 0
+push constant 0
+pop static 0
+push constant 2048
+pop static 1
+push constant 0
+return
+function Memory.peek 0
+push argument 0
+push static 0
+add
+pop pointer 1
+push that 0
+return
+function Memory.poke 0
+push argument 0
+push static 0
+add
+push argument 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 0
+return
+function Memory.alloc 0
+push static 1
+push argument 0
+add
+pop static 1
+push static 1
+push argument 0
+sub
+return
+function Memory.deAlloc 0
+push constant 0
+return

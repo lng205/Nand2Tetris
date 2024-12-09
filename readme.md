@@ -12,7 +12,7 @@
 
 课程涵盖了计算机组成原理、体系结构、编译原理、操作系统的内容。
 
-虽然课程对所涉及的领域都只是浅尝辄止，但这种完整的、从零开始自己动手一遍造轮子的体验，是复杂的理论无法替代的。~~太棒了，我逐渐理解一切~~
+虽然课程对所涉及的领域都只是浅尝辄止，但这种完整的、从零开始自己动手一遍造轮子的体验，是复杂的理论无法替代的。
 
 ## 资源
 
@@ -56,9 +56,9 @@
 
 ## 下半部分
 
-> So, who are the good souls who turn high-level programming into an advanced
+<!-- > So, who are the good souls who turn high-level programming into an advanced
 > technology indistinguishable from magic? They are the software wizards
-> who develop compilers, virtual machines, and operating systems.
+> who develop compilers, virtual machines, and operating systems. -->
 
 在HACK上进行软件开发，实现一门面向对象的高级语言的前端和后端编译器，以及实现操作系统API，最终设计并运行俄罗斯方块这样的图形游戏。
 
@@ -72,3 +72,5 @@
 ### [Week10](./10/readme.md)
 
 ### [Week11](./11/readme.md)
+
+### [Week12](./12/readme.md)

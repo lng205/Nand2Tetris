@@ -11,54 +11,123 @@
  * string-oriented operations.
  */
 class String {
+    field Array s;
+    field int length;
+    field int maxLen;
 
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
+        if (maxLength > 0) {
+            let s = Array.new(maxLength);
+        }
+        let length = 0;
+        let maxLen = maxLength;
+        return this;
     }
 
     /** Disposes this string. */
     method void dispose() {
+        if (maxLen > 0) {
+            do s.dispose();
+        }
+        do Memory.deAlloc(this);
+        return;
     }
 
     /** Returns the current length of this string. */
     method int length() {
+        return length;
     }
 
     /** Returns the character at the j-th location of this string. */
     method char charAt(int j) {
+        return s[j];
     }
 
     /** Sets the character at the j-th location of this string to c. */
     method void setCharAt(int j, char c) {
+        let s[j] = c;
+        return;
     }
 
     /** Appends c to this string's end and returns this string. */
     method String appendChar(char c) {
+        if (length < maxLen) {
+            let s[length] = c;
+            let length = length + 1;
+        }
+        return this;
     }
 
     /** Erases the last character from this string. */
     method void eraseLastChar() {
+        if (length > 0) {
+            let length = length - 1;
+        }
+        return;
     }
 
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
+        var int i, val;
+        var bool neg;
+        let val = 0;
+
+        if (s[0] = 45) {
+            let i = 1;
+            let neg = true;
+        } else {
+            let i = 0;
+            let neg = false;
+        }
+
+        while ((i < length) & (s[i] > 47) & (s[i] < 58)) {
+            let val = val * 10 + (s[i] - 48);
+            let i = i + 1;
+        }
+
+        if (neg) {
+            return -val;
+        } else {
+            return val;
+        }
     }
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+        let length = 0;
+        if (val < 0) {
+            let val = -val;
+            do appendChar(45);
+        }
+        do setIntHelper(val);
+        return;
+    }
+
+    method void setIntHelper(int val) {
+        var int digit;
+        let digit = val - (val / 10 * 10);
+        if (val > 9) {
+            do setIntHelper(val / 10);
+        }
+        do appendChar(digit + 48);
+        return;
     }
 
     /** Returns the new line character. */
     function char newLine() {
+        return 128;
     }
 
     /** Returns the backspace character. */
     function char backSpace() {
+        return 129;
     }
 
     /** Returns the double quote (") character. */
     function char doubleQuote() {
+        return 34;
     }
 }
