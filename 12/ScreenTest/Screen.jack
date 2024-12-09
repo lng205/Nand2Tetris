@@ -63,7 +63,20 @@ class Screen {
     function void drawHorizontalLine(int x1, int x2, int y) {
         var int x;
         let x = x1;
-        while (x < (x2 + 1)) {
+        while (x < (x2 + 1)){
+
+            // Accelerate drawing by filling 16 pixels at a time
+            if (x - (x / 16 * 16) = 0) {
+                while ((x + 16) < x2) {
+                    if (color) {
+                        do Memory.poke(16384 + (y * 32) + (x / 16), -1);
+                    } else {
+                        do Memory.poke(16384 + (y * 32) + (x / 16), 0);
+                    }
+                    let x = x + 16;
+                }
+            }
+
             do Screen.drawPixel(x, y);
             let x = x + 1;
         }
